@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html  charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+
+        <!-- Compiled and minified CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        
+        <!-- Compiled and minified JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <script>
+            $(function() {
+
+                let socket = io('ws://localhost', {
+                    transports: ['websocket']
+                })
+
+                let chatList = $("#chatList")
+                let clientList = $("#clientList")
+                let myName = ''
+
+                // 연결
+                socket.on('connect', (res) => {
+                    if(res != undefined) {
+                        chatList.append(res.message)
+                        clientList.html(res.clientList)
+                    }
+                })
+
+                // 접속자 목록 새로고침(이름 변경)
+                socket.on('refreshClient', (res) => {
+                    chatList.append(res.message)
+                    clientList.html(res.clientList)
+                })
+
+                // 닉네임 수정(본인)
+                socket.on('changeMyName', (res) => {
+                    myName = res.myName
+                    $("span.myName").html(myName)
+                    clientList.html(res.clientList)
+                })
+
+                // 메시지 갱신
+                socket.on('message', (message) => {
+                    chatList.append(message.message)
+                    clientList.html(message.clientList)
+
+                    $("input[name=message]").val('')
+                    $("input[name=message]").focus()
+                    $('.chat-wrapper').scrollTop($(document).height())
+                })
+
+                // 이름변경
+                $("button[name=changeName]").click(() => {
+                    let name = $("input[name=name]").val()
+                    if(name == '') {
+                        alert('이름은 공백으로 할수 없습니다.')
+                        return false
+                    }
+                    socket.emit('nick', name, (res) => {
+                        if(res == 'X') {
+                            alert('중복된 닉네임 입니다.')
+                        }
+
+                        $('input[name=name]').val('')
+                    })
+                })
+
+                // 메시지 전송
+                $("button[name=send]").click(() => {
+                    let msg = $("input[name=message]").val()
+                    
+                    if(msg == '') {
+                        alert('공백은 보낼수 없습니다.')
+                        return false
+                    }
+                    
+                    let sendData = {
+                        clientList: '',
+                        message: msg
+                    }
+                    socket.emit('send', sendData, (res) => {
+
+                    })
+                    return false
+                })
+
+                // enter키 전송
+                $("input[name=message]").keydown( event => {
+                    if(event.keyCode == 13) {
+                        event.preventDefault();
+                        $("button[name=send]").trigger("click")
+                    }
+                })
+                
+                // 채팅방 내용 지우기
+                $('button[name=remove]').click(() => {
+                    chatList.html('')
+                })
+            })
+        </script>
+        <style>
+            body {
+                background-color: #F9F8F8;
+            }
+            .container {
+                background-color: #fff;
+                margin-top: 10%;
+                border: 1px solid #eee;
+                padding: 10px;
+                width: 80%;
+            }
+            .room-wrapper {
+                height: 600px;
+            }
+
+            /* 접속자 목록 */
+            .client-wrapper {
+                padding: 0 10px;
+                height: 600px;
+                background-color: #eeeeee;
+                border-right: 2px solid #007bff;
+            }
+            /* .client-wrapper > p {
+                margin-top: 0;
+            } */
+            .chat-wrapper {
+                height: 600px;
+                overflow-y: auto;
+            }
+            span.myName {
+                font-weight: bold;
+                color: #007bff;
+            }
+            p.clients {
+                margin: 1px;
+            }
+
+            .col button {
+                margin-top: 10px;
+            }
+
+            button[name=remove] {
+                margin-left: 10px;
+            }
+            /* 채팅 */
+            p.msg {
+                margin: 1px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row room-wrapper">
+                <div class="col s4 m4 client-col">
+                    <div class="client-wrapper">
+                        <p class="center-align">현재 접속자</p>
+                        <div class="row">
+                            <div class="col s1"></div>
+                            <input type="text" class="col s5" name="name">
+                            <div class="col s1"></div>
+                            <button class="blue btn-small col s3" name="changeName">이름변경</button>
+                        </div>
+                        <small>나 : <span class="myName"></span></small>
+                        <div id="clientList"></div><br>
+                    </div>
+                </div>
+                <div class="col s8 m8">
+                    <div class="chat-wrapper">
+                        <div id="chatList"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-wrapper">
+                    <div class="col s9">
+                        <input type="text" name="message" class="message">
+                    </div>
+                    <div class="col s3">
+                        <button type="button" class="btn-small blue" name="send">전송</button>
+                        <button type="button" class="btn-small red" name="remove">내용지우기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
