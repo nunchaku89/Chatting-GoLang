@@ -123,6 +123,7 @@
                 height: 600px;
                 background-color: #eeeeee;
                 border-right: 2px solid #007bff;
+                transition: .3s ease-in;
             }
             /* .client-wrapper > p {
                 margin-top: 0;
@@ -130,6 +131,7 @@
             .chat-wrapper {
                 height: 600px;
                 overflow-y: auto;
+                overflow-wrap: break-word;
             }
             span.myName {
                 font-weight: bold;
@@ -141,6 +143,7 @@
 
             .col button {
                 margin-top: 10px;
+                transition: .3s ease-out;
             }
 
             button[name=remove] {
@@ -150,25 +153,32 @@
             p.msg {
                 margin: 1px;
             }
+
+            @media only screen and (max-width: 992px) {
+                .client-wrapper {
+                    height: 100%;
+                    border-bottom: 2px solid #007bff;
+                    border-right: none;
+                }
+            }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="row room-wrapper">
-                <div class="col s4 m4 client-col">
+                <div class="col s12 m12 l4 client-col">
                     <div class="client-wrapper">
                         <p class="center-align">현재 접속자</p>
                         <div class="row">
-                            <div class="col s1"></div>
-                            <input type="text" class="col s5" name="name">
-                            <div class="col s1"></div>
-                            <button class="blue btn-small col s3" name="changeName">이름변경</button>
+                            <!-- <div class="col s1"></div> -->
+                            <input type="text" class="col s12 l8" name="name">
+                            <button class="blue btn-small col s12 l3 offset-l1" name="changeName">이름변경</button>
                         </div>
                         <small>나 : <span class="myName"></span></small>
                         <div id="clientList"></div><br>
                     </div>
                 </div>
-                <div class="col s8 m8">
+                <div class="col s12 m12 l8">
                     <div class="chat-wrapper">
                         <div id="chatList"></div>
                     </div>
@@ -176,10 +186,10 @@
             </div>
             <div class="row">
                 <div class="input-wrapper">
-                    <div class="col s9">
+                    <div class="col s12 m9">
                         <input type="text" name="message" class="message">
                     </div>
-                    <div class="col s3">
+                    <div class="col s12 m3">
                         <button type="button" class="btn-small blue" name="send">전송</button>
                         <button type="button" class="btn-small red" name="remove">내용지우기</button>
                     </div>
