@@ -37,8 +37,14 @@ func main() {
 
 	// 서버
 	serveMux := http.NewServeMux()
+	serveMux.HandleFunc("/", home)
 	serveMux.Handle("/socket.io/", server)
 	log.Panic(http.ListenAndServe("127.0.0.1:80", serveMux))
+}
+
+// 채팅
+func home(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, r.URL.Path[1:])
 }
 
 // 연결
