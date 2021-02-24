@@ -22,7 +22,7 @@
                 let clientList = $("#clientList")
                 let myName = ''
 
-                // 연결
+                // 연 결
                 socket.on('connect', (res) => {
                     if(res != undefined) {
                         chatList.append(res.message)
