@@ -30,7 +30,7 @@
                     }
                 })
 
-                // 접속자 목록 새로고침(이름 변경)
+                // 접속자 목록 새로고침(이름변경)
                 socket.on('refreshClient', (res) => {
                     chatList.append(res.message)
                     clientList.html(res.clientList)
